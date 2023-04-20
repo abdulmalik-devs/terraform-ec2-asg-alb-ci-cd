@@ -47,7 +47,7 @@ jobs:
 #       with:
 #         terraform_version: 1.0.0
 
-plan:
+  plan:
     needs: lint
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev-branch'
@@ -67,7 +67,7 @@ plan:
       working-directory: ./Terraform_Project
       run: terraform plan
 
-pull-request-to-main:
+  pull-request-to-main:
     needs: plan
     if: github.ref == 'refs/heads/dev-branch'
     runs-on: ubuntu-latest
@@ -84,7 +84,7 @@ pull-request-to-main:
         body: "Automated Pull Request from feature/a"
         base: main
 
-apply:
+  apply:
     needs: pull-request-to-main
     if: github.ref == 'main' &&
         github.event.pull_request.merged == true   
@@ -100,7 +100,7 @@ apply:
       working-directory: ./Terraform_Project
       run: terraform apply -auto-approve
 
-pull-request-to-ops-branch:
+  pull-request-to-ops-branch:
     needs: apply
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -117,7 +117,7 @@ pull-request-to-ops-branch:
         body: "Automated Pull Request from main"
         base: ops-branch
 
-destroy:
+  destroy:
     needs: pull-request-to-ops-branch
     if: github.ref == 'refs/heads/ops-branch'
     runs-on: ubuntu-latest
