@@ -48,6 +48,7 @@ jobs:
       working-directory: ./
       run: terraform plan
 
+
   pull-request-to-main:
     needs: plan
     if: github.ref == 'refs/heads/dev-branch'
@@ -93,7 +94,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         commit-message: "Automated Pull Request from main"
-        branch: main
+        branch: ops-branch
         title: "Automated Pull Request from main"
         body: "Automated Pull Request from main"
         base: ops-branch
