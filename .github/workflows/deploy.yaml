@@ -67,7 +67,7 @@ jobs:
   #       base: main
 
   apply:
-    needs: pull-request-to-main
+    needs: plan
     if: github.ref == 'main' &&
         github.event.pull_request.merged == true   
     runs-on: ubuntu-latest
@@ -100,7 +100,7 @@ jobs:
   #       base: ops-branch
 
   destroy:
-    needs: pull-request-to-ops-branch
+    needs: apply
     if: github.ref == 'refs/heads/ops-branch'
     runs-on: ubuntu-latest
     steps:
