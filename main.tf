@@ -109,9 +109,16 @@ resource "aws_lb_target_group" "instance-tg" {
 }
 
 # Attach EC2 Instance to a Target group
-resource "aws_lb_target_group_attachment" "instance-tg-attach" {
+resource "aws_lb_target_group_attachment" "instance-tg-attach-n" {
   target_group_arn = aws_lb_target_group.instance-tg.arn
   target_id        = aws_instance.nginx-server.id
+  port             = 80
+}
+
+# Attach EC2 Instance to a Target group
+resource "aws_lb_target_group_attachment" "instance-tg-attach-a" {
+  target_group_arn = aws_lb_target_group.instance-tg.arn
+  target_id        = aws_instance.nginx-apache.id
   port             = 80
 }
 
@@ -156,6 +163,7 @@ resource "aws_autoscaling_group" "instance-asg" {
   health_check_grace_period = 300
   health_check_type         = "ELB"
   force_delete              = true
+  target_group_arns         = [aws_lb_target_group.instance-tg.arn]
 
   launch_template {
     id      = aws_launch_template.instance-temp.id
