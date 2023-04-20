@@ -67,7 +67,7 @@ jobs:
   #       base: main
 
   apply:
-    needs: plan
+    needs: lint
     if: github.ref == 'main' && github.event.pull_request.merged == true   
     runs-on: ubuntu-latest
     steps:
