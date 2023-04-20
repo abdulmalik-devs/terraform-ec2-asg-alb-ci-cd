@@ -104,7 +104,7 @@ resource "aws_lb_target_group" "instance-tg" {
     path                = "/"
     port                = 80
     protocol            = "HTTP"
-    timeout             = 60
+    timeout             = 10
   }
 }
 
