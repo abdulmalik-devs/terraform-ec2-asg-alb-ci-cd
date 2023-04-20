@@ -63,7 +63,7 @@ data "aws_subnets" "subnets" {
 resource "aws_security_group" "instance-sg" {
   name        = "instance-sg"
   description = "SSH on port 22 and HTTP on port 80"
-  vpc_id      = aws_default_vpc.default.id
+  vpc_id      = [aws_default_vpc.default.id]
 
   ingress {
     from_port   = 22
