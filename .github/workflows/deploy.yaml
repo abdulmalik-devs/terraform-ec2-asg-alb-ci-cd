@@ -1,4 +1,4 @@
-name: Terraform Deployment
+name: Terraform Deployment CI/CD
 
 on:
   push:
@@ -23,29 +23,10 @@ jobs:
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.0.9
+          terraform_version: 1.1.9
       - name: Format Terraform code
-        working-directory: ./Terraform_Project
-        run: terraform fmt -check -diff -recursive
-#     steps:
-#     - name: Checkout code
-#       uses: actions/checkout@v2
-#     - name: Install Terraform
-#       uses: hashicorp/setup-terraform@v1
-#       with:
-#         terraform_version: 1.0.9
-
-# lint:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: Checkout code
-#       uses: actions/checkout@v2
-#       with:
-#         ref: ${{ github.event.pull_request.head.sha }}
-#     - name: Terraform Lint
-#       uses: eerkunt/terraform-validator-action@v2
-#       with:
-#         terraform_version: 1.0.0
+        working-directory: ./
+        run: terraform fmt
 
   plan:
     needs: lint
@@ -59,12 +40,12 @@ jobs:
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v1
       with:
-        terraform_version: 1.0.0
+        terraform_version: 1.1.0
     - name: Terraform init
-      working-directory: ./Terraform_Project
+      working-directory: ./
       run: terraform init
     - name: Terraform Plan
-      working-directory: ./Terraform_Project
+      working-directory: ./
       run: terraform plan
 
   pull-request-to-main:
@@ -78,10 +59,10 @@ jobs:
       uses: peter-evans/create-pull-request@v3.7.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: "Automated Pull Request from feature/a"
-        branch: main
-        title: "Automated Pull Request from feature/a"
-        body: "Automated Pull Request from feature/a"
+        commit-message: "Automated Pull Request from dev-branch"
+        branch: dev-branch
+        title: "Automated Pull Request from dev-branch"
+        body: "Automated Pull Request from dev-branch"
         base: main
 
   apply:
@@ -95,9 +76,9 @@ jobs:
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v1
       with:
-        terraform_version: 1.0.0
+        terraform_version: 1.1.0
     - name: Terraform Apply
-      working-directory: ./Terraform_Project
+      working-directory: ./
       run: terraform apply -auto-approve
 
   pull-request-to-ops-branch:
@@ -112,7 +93,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         commit-message: "Automated Pull Request from main"
-        branch: ops-branch
+        branch: main
         title: "Automated Pull Request from main"
         body: "Automated Pull Request from main"
         base: ops-branch
@@ -129,7 +110,7 @@ jobs:
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v1
       with:
-        terraform_version: 1.0.0
+        terraform_version: 1.1.0
     - name: Terraform Destroy
-      working-directory: ./Terraform_Project
+      working-directory: ./
       run: terraform destroy -auto-approve
