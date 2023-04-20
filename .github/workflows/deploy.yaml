@@ -1,4 +1,4 @@
-name: Terraform Deployment CI/CD
+name: Terraform CI/CD
 
 on:
   push:
@@ -48,25 +48,26 @@ jobs:
       working-directory: ./
       run: terraform plan
 
-  pull-request-to-main:
-    needs: plan
-    if: github.ref == 'refs/heads/dev-branch'
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v3.7.0
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: "Automated Pull Request from dev-branch"
-        branch: dev-branch
-        title: "Automated Pull Request from dev-branch"
-        body: "Automated Pull Request from dev-branch"
-        base: main
+
+  # pull-request-to-main:
+  #   needs: plan
+  #   if: github.ref == 'refs/heads/dev-branch'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v2
+  #   - name: Create Pull Request
+  #     uses: peter-evans/create-pull-request@v3.7.0
+  #     with:
+  #       token: ${{ secrets.GITHUB_TOKEN }}
+  #       commit-message: "Automated Pull Request from dev-branch"
+  #       branch: dev-branch
+  #       title: "Automated Pull Request from dev-branch"
+  #       body: "Automated Pull Request from dev-branch"
+  #       base: main
 
   apply:
-    needs: pull-request-to-main
+    needs: plan
     if: github.ref == 'main' &&
         github.event.pull_request.merged == true   
     runs-on: ubuntu-latest
@@ -81,25 +82,25 @@ jobs:
       working-directory: ./
       run: terraform apply -auto-approve
 
-  pull-request-to-ops-branch:
-    needs: apply
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v3.7.0
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: "Automated Pull Request from main"
-        branch: main
-        title: "Automated Pull Request from main"
-        body: "Automated Pull Request from main"
-        base: ops-branch
+  # pull-request-to-ops-branch:
+  #   needs: apply
+  #   if: github.ref == 'refs/heads/main'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v2
+  #   - name: Create Pull Request
+  #     uses: peter-evans/create-pull-request@v3.7.0
+  #     with:
+  #       token: ${{ secrets.GITHUB_TOKEN }}
+  #       commit-message: "Automated Pull Request from main"
+  #       branch: ops-branch
+  #       title: "Automated Pull Request from main"
+  #       body: "Automated Pull Request from main"
+  #       base: ops-branch
 
   destroy:
-    needs: pull-request-to-ops-branch
+    needs: apply
     if: github.ref == 'refs/heads/ops-branch'
     runs-on: ubuntu-latest
     steps:

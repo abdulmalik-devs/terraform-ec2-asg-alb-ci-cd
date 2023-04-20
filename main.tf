@@ -49,11 +49,14 @@ resource "aws_instance" "apache-server" {
 
 resource "aws_default_vpc" "default" {}
 
-resource "aws_default_subnet" "instance-subnet" {
-  availability_zone = "us-east-1a"
+data "aws_vpc" "default_vpc" {
+  default = true
+}
 
-  tags = {
-    Name = "Default subnet for us-east-1"
+data "aws_subnets" "subnets" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default_vpc.id]
   }
 }
 
@@ -117,7 +120,7 @@ resource "aws_lb" "instance-lb" {
   internal                  = false
   load_balancer_type        = "application"
   security_groups           = [aws_security_group.instance-sg.id]
-  subnets                   = [for subnet in aws_default_subnet.instance-subnet : subnet.id]
+  subnets                   = data.aws_subnets.subnets.ids
   idle_timeout              = 400
 
   enable_deletion_protection = true
