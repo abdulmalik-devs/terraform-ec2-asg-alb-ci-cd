@@ -15,25 +15,37 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Install Terraform
-      uses: hashicorp/setup-terraform@v1
-      with:
-        terraform_version: 1.0.9
-
-lint:
+  lint:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-    - name: Terraform Lint
-      uses: eerkunt/terraform-validator-action@v2
-      with:
-        terraform_version: 1.0.0
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.9
+      - name: Format Terraform code
+        working-directory: ./Terraform_Project
+        run: terraform fmt -check -diff -recursive
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v2
+#     - name: Install Terraform
+#       uses: hashicorp/setup-terraform@v1
+#       with:
+#         terraform_version: 1.0.9
+
+# lint:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v2
+#       with:
+#         ref: ${{ github.event.pull_request.head.sha }}
+#     - name: Terraform Lint
+#       uses: eerkunt/terraform-validator-action@v2
+#       with:
+#         terraform_version: 1.0.0
 
 plan:
     needs: lint
