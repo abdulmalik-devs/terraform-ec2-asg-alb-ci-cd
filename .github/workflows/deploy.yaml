@@ -1,0 +1,124 @@
+name: Terraform Deployment
+
+on:
+  push:
+    branches:
+      - dev-branch
+
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+      - ops-branch
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.9
+
+lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: Terraform Lint
+      uses: eerkunt/terraform-validator-action@v2
+      with:
+        terraform_version: 1.0.0
+
+plan:
+    needs: lint
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev-branch'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.0
+    - name: Terraform init
+      working-directory: ./Terraform_Project
+      run: terraform init
+    - name: Terraform Plan
+      working-directory: ./Terraform_Project
+      run: terraform plan
+
+pull-request-to-main:
+    needs: plan
+    if: github.ref == 'refs/heads/dev-branch'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v3.7.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "Automated Pull Request from feature/a"
+        branch: main
+        title: "Automated Pull Request from feature/a"
+        body: "Automated Pull Request from feature/a"
+        base: main
+
+apply:
+    needs: pull-request-to-main
+    if: github.ref == 'main' &&
+        github.event.pull_request.merged == true   
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.0
+    - name: Terraform Apply
+      working-directory: ./Terraform_Project
+      run: terraform apply -auto-approve
+
+pull-request-to-ops-branch:
+    needs: apply
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v3.7.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "Automated Pull Request from main"
+        branch: ops-branch
+        title: "Automated Pull Request from main"
+        body: "Automated Pull Request from main"
+        base: ops-branch
+
+destroy:
+    needs: pull-request-to-ops-branch
+    if: github.ref == 'refs/heads/ops-branch'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.0
+    - name: Terraform Destroy
+      working-directory: ./Terraform_Project
+      run: terraform destroy -auto-approve

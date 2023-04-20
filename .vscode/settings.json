@@ -1,5 +1,8 @@
 {
     "yaml.schemas": {
-        "https://json.schemastore.org/eslintrc.json": "file:///home/devsec/Desktop/Terraform_Project/.github/workflows/deploy.yaml"
+        "https://json.schemastore.org/eslintrc.json": [
+            "file:///home/devsec/Desktop/Terraform_Project/.github/workflows/deploy.yaml",
+            "file:///home/devsec/Desktop/Project/Terraform_Project/.github/workflows/deploy.yaml"
+        ]
     }
 }
