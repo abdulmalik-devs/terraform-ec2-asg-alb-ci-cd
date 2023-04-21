@@ -1,7 +1,6 @@
 # Create an Auto scaling group for spin up required instances
 resource "aws_autoscaling_group" "instance-asg" {
   name                      = "instance-asg"
-  availability_zones        = ["us-east-1a"]
   desired_capacity          = 2
   max_size                  = 5
   min_size                  = 1
