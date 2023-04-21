@@ -90,3 +90,4 @@ resource "aws_security_group" "instance-sg" {
     self             = false
     to_port          = 0
   }
+}
