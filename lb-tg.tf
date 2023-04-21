@@ -21,7 +21,7 @@ resource "aws_lb_target_group" "instance-tg" {
   port     = 80
   protocol = "HTTP"
   target_type = "instance"
-  vpc_id   = aws_vpc.default_vpc.id
+  vpc_id   = data.aws_vpc.default_vpc.id
 
   health_check {
     enabled             = true
