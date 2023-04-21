@@ -118,7 +118,7 @@ resource "aws_lb_target_group_attachment" "instance-tg-attach-n" {
 # Attach EC2 Instance to a Target group
 resource "aws_lb_target_group_attachment" "instance-tg-attach-a" {
   target_group_arn = aws_lb_target_group.instance-tg.arn
-  target_id        = aws_instance.nginx-apache.id
+  target_id        = aws_instance.apache-server.id
   port             = 80
 }
 
