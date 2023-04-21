@@ -1,8 +1,3 @@
-# Provider showing the region to provision your resources
-provider "aws" {
-  region = "us-east-1"
-}
-
 # An AMI information for the EC2 Instance to be Created
 data "aws_ami" "ubuntu" {
   most_recent = true
@@ -17,42 +12,36 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-terraform {
-  backend "s3" {
-    bucket = "terra-file"
-    key    = "tf-statefile/terraform.tfstate"
-    region = "us-east-1"
-  }
-}
-
+# Nginx Server configuration
 resource "aws_instance" "nginx-server" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
   key_name      = var.key_name
-  user_data     = file("user-data-nginx.tpl")
+  user_data     = file("./user-data-nginx.tpl")
 
   tags = {
     Name = "nginx-server"
   }
 }
 
+# Apache Server configuration
 resource "aws_instance" "apache-server" {
   ami           = "ami-007855ac798b5175e"
   instance_type = "t2.micro"
   key_name      = var.key_name
-  user_data     = file("user-data-apache.tpl")
+  user_data     = file("./user-data-apache.tpl")
 
   tags = {
     Name = "apache-server"
   }
 }
 
-resource "aws_default_vpc" "default" {}
-
+# Data source for aws vpc
 data "aws_vpc" "default_vpc" {
   default = true
 }
 
+# Data source for subnets
 data "aws_subnets" "subnets" {
   filter {
     name   = "vpc-id"
@@ -60,33 +49,48 @@ data "aws_subnets" "subnets" {
   }
 }
 
+# Instance Security group configuration to allow port 80(HTTP), 22(SSH) respectively.
 resource "aws_security_group" "instance-sg" {
   name        = "instance-sg"
   description = "SSH on port 22 and HTTP on port 80"
-  vpc_id      = aws_default_vpc.default.id
+  vpc_id      = data.aws_vpc.default_vpc.id
 
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks      = ["0.0.0.0/0"]
+    description      = "allow ssh"
+    from_port        = 22
+    ipv6_cidr_blocks = []
+    prefix_list_ids  = []
+    protocol         = "tcp"
+    security_groups  = []
+    self             = false
+    to_port          = 22
   }
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks      = ["0.0.0.0/0"]
+    description      = "allow http"
+    from_port        = 80
+    ipv6_cidr_blocks = []
+    prefix_list_ids  = []
+    protocol         = "tcp"
+    security_groups  = []
+    self             = false
+    to_port          = 80
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks      = ["0.0.0.0/0"]
+    description      = ""
+    from_port        = 0
+    ipv6_cidr_blocks = []
+    prefix_list_ids  = []
+    protocol         = "-1"
+    security_groups  = []
+    self             = false
+    to_port          = 0
   }
 }
-# ---------------------------------------------------------------------------------------
 
 # Create a target group for EC2 Instances
 resource "aws_lb_target_group" "instance-tg" {
@@ -170,4 +174,3 @@ resource "aws_autoscaling_group" "instance-asg" {
     version = "$Latest"
   }
 }
-
