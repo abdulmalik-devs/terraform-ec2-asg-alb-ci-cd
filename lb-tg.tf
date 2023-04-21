@@ -8,7 +8,7 @@ resource "aws_lb" "instance-lb" {
   subnets                   = data.aws_subnets.subnets.ids
   idle_timeout              = 400
 
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 
   tags = {
     Environment = "Terra-LoadBalancer"
