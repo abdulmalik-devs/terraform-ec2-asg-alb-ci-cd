@@ -51,5 +51,18 @@ resource "aws_launch_template" "apache-temp" {
   }
 }
 
+data "template_file" "apache-data-script" {
+  template = file("./user-data-apache.tpl")
+  vars = {
+    server = "apache"
+  }
+}
 
+
+data "template_file" "nginx-data-script" {
+  template = file("./user-data-nginx.tpl")
+  vars = {
+    server = "nginx"
+  }
+}
 
