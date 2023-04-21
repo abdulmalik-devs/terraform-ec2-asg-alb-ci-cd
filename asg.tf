@@ -24,7 +24,7 @@ resource "aws_launch_template" "nginx-temp" {
   instance_type = "t2.micro"
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.instance-sg.id]
-  user_data              = file(user-data-nginx.tpl)
+  user_data              = base64encode(user-data-nginx.tpl.rendered)
 
    tag_specifications {
     resource_type = "instance"
@@ -41,7 +41,7 @@ resource "aws_launch_template" "apache-temp" {
   instance_type = "t2.micro"
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.instance-sg.id]
-  user_data              = file(user-data-nginx.tpl)
+  user_data              = base64encode(user-data-apache.tpl.rendered)
 
    tag_specifications {
     resource_type = "instance"
