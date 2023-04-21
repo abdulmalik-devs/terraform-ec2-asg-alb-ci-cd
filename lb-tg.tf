@@ -8,7 +8,7 @@ resource "aws_lb" "instance-lb" {
   subnets                   = data.aws_subnets.subnets.ids
   idle_timeout              = 400
 
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 
   tags = {
     Environment = "Terra-LoadBalancer"
@@ -37,14 +37,14 @@ resource "aws_lb_target_group" "instance-tg" {
 }
 
 # Attach EC2 Instance to a Target group
-resource "aws_lb_target_group_attachment" "instance-tg-attach-n" {
+resource "aws_lb_target_group_attachment" "instance-tg-attach-N" {
   target_group_arn = aws_lb_target_group.instance-tg.arn
   target_id        = aws_instance.nginx-server.id
   port             = 80
 }
 
 # Attach EC2 Instance to a Target group
-resource "aws_lb_target_group_attachment" "instance-tg-attach-a" {
+resource "aws_lb_target_group_attachment" "instance-tg-attach-A" {
   target_group_arn = aws_lb_target_group.instance-tg.arn
   target_id        = aws_instance.apache-server.id
   port             = 80
