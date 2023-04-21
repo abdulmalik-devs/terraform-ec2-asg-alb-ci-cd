@@ -9,12 +9,12 @@ terraform {
   backend "s3" {
     bucket = "terra-file"
     key    = "tf-statefile/terraform.tfstate"
-    region = "us-east-2"
+    region = "us-east-1"
   }
 
   required_version = ">=1.1.0"
 }
 
 provider "aws" {
-  region = "us-east-2"
+  region = "us-east-1"
 }
