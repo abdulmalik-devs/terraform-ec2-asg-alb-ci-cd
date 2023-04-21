@@ -35,9 +35,9 @@ resource "aws_launch_template" "nginx-temp" {
 
 # Create a launch template for Apache Server
 resource "aws_launch_template" "apache-temp" {
-  name_prefix   = "apache-temp"
-  image_id      = data.aws_ami.ubuntu.id
-  instance_type = "t2.micro"
+  name_prefix            = "apache-temp"
+  image_id               = data.aws_ami.ubuntu.id
+  instance_type          = "t2.micro"
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.instance-sg.id]
   user_data              = base64encode(data.template_file.nginx-data-script.rendered)
@@ -56,7 +56,6 @@ data "template_file" "apache-data-script" {
     server = "apache"
   }
 }
-
 
 data "template_file" "nginx-data-script" {
   template = file("./user-data-nginx.tpl")
