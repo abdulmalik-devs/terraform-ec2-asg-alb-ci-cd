@@ -1,7 +1,7 @@
 # Create an Auto scaling group for spin up required instances
 resource "aws_autoscaling_group" "instance-asg" {
   name                      = "instance-asg"
-  desired_capacity          = 6
+  desired_capacity          = 2
   max_size                  = 2
   min_size                  = 2
   health_check_grace_period = 300
