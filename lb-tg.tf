@@ -6,7 +6,6 @@ resource "aws_lb" "instance-lb" {
   ip_address_type           = "ipv4"
   security_groups           = [aws_security_group.instance-sg.id]
   subnets                   = data.aws_subnets.subnets.ids
-  idle_timeout              = 400
 
   enable_deletion_protection = false
 
@@ -27,24 +26,24 @@ resource "aws_lb_target_group" "instance-tg" {
     enabled             = true
     healthy_threshold   = 3
     unhealthy_threshold = 3
-    interval            = 10
+    interval            = 30
     matcher             = "200-399"
-    path                = "/"
+    path                = "/health"
     port                = 80
     protocol            = "HTTP"
-    timeout             = 2
+    timeout             = 5
   }
 }
 
-# Attach EC2 Instance to a Target group
-resource "aws_lb_target_group_attachment" "instance-tg-attach-n" {
+# Attach Nginx Instance to a Target group
+resource "aws_lb_target_group_attachment" "instance-tg-attach-nginx" {
   target_group_arn = aws_lb_target_group.instance-tg.arn
   target_id        = aws_instance.nginx-server.id
   port             = 80
 }
 
-# Attach EC2 Instance to a Target group
-resource "aws_lb_target_group_attachment" "instance-tg-attach-a" {
+# Attach Apache Instance to a Target group
+resource "aws_lb_target_group_attachment" "instance-tg-attach-apache" {
   target_group_arn = aws_lb_target_group.instance-tg.arn
   target_id        = aws_instance.apache-server.id
   port             = 80
