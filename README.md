@@ -29,7 +29,7 @@ git clone https://github.com/abdulmalik-devs/terraform-ec2-ci-cd.git
 
 >terraform init
 
-4. Preview the changes that Terraform will make:
+4. Preview and verify the changes before you apply :
 
 >terraform plan
 
@@ -43,7 +43,7 @@ git clone https://github.com/abdulmalik-devs/terraform-ec2-ci-cd.git
 
 ## Variables
 
-The following variables can be defined in your `Github Secrets` file:
+Createt The following variables in your `Github Secrets` file:
 
 | Variable   | Description                                      | Type   |
 | ---------- | ------------------------------------------------ | ------ |
