@@ -21,7 +21,7 @@ N.B: The infrastructure can be deployed to multiple environments (e.g. dev, stag
 
 1. Clone this repository:
 
-git clone [https://github.com/abdulmalik-devs/terraform-ec2-ci-cd.git]
+git clone https://github.com/abdulmalik-devs/terraform-ec2-ci-cd.git
 
 2. Check the code and change the neccessary configuration to suite your deployement
 
