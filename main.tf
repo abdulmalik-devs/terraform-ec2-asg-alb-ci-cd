@@ -1,8 +1,3 @@
-# Provider showing the region to provision your resources
-provider "aws" {
-  region = "us-east-1"
-}
-
 # An AMI information for the EC2 Instance to be Created
 data "aws_ami" "ubuntu" {
   most_recent = true
@@ -17,146 +12,85 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-terraform {
-  backend "s3" {
-    bucket = "terra-file"
-    key    = "tf-statefile/terraform.tfstate"
-    region = "us-east-1"
-  }
-}
-
+# Nginx Server configuration
 resource "aws_instance" "nginx-server" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
   key_name      = var.key_name
-  user_data     = file("user-data-nginx.tpl")
+  user_data     = file("./user-data-nginx.tpl")
+  vpc_security_group_ids = [aws_security_group.instance-sg.id]
 
   tags = {
     Name = "nginx-server"
   }
 }
 
+# Apache Server configuration
 resource "aws_instance" "apache-server" {
   ami           = "ami-007855ac798b5175e"
   instance_type = "t2.micro"
   key_name      = var.key_name
-  user_data     = file("user-data-apache.tpl")
+  user_data     = file("./user-data-apache.tpl")
+  vpc_security_group_ids = [aws_security_group.instance-sg.id]
 
   tags = {
     Name = "apache-server"
   }
 }
 
-resource "aws_default_vpc" "default" {}
+# Data source for aws vpc
+data "aws_vpc" "default_vpc" {
+  default = true
+}
 
-resource "aws_default_subnet" "instance-subnet" {
-  availability_zone = "us-east-1a"
-
-  tags = {
-    Name = "Default subnet for us-east-1"
+# Data source for subnets
+data "aws_subnets" "subnets" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default_vpc.id]
   }
 }
 
+# Instance Security group configuration to allow port 80(HTTP), 22(SSH) respectively.
 resource "aws_security_group" "instance-sg" {
   name        = "instance-sg"
   description = "SSH on port 22 and HTTP on port 80"
-  vpc_id      = aws_default_vpc.default.id
+  vpc_id      = data.aws_vpc.default_vpc.id
 
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks      = ["0.0.0.0/0"]
+    description      = "allow ssh"
+    from_port        = 22
+    ipv6_cidr_blocks = []
+    prefix_list_ids  = []
+    protocol         = "tcp"
+    security_groups  = []
+    self             = false
+    to_port          = 22
   }
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks      = ["0.0.0.0/0"]
+    description      = "allow http"
+    from_port        = 80
+    ipv6_cidr_blocks = []
+    prefix_list_ids  = []
+    protocol         = "tcp"
+    security_groups  = []
+    self             = false
+    to_port          = 80
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-# ---------------------------------------------------------------------------------------
-
-# Create a target group for EC2 Instances
-resource "aws_lb_target_group" "instance-tg" {
-  name     = "instance-tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_default_vpc.default.id
-
-  health_check {
-    enabled             = true
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    interval            = 10
-    matcher             = 200
-    path                = "/"
-    port                = 80
-    protocol            = "HTTP"
-    timeout             = 60
-  }
-}
-
-# Attach EC2 Instance to a Target group
-resource "aws_lb_target_group_attachment" "instance-tg-attach" {
-  target_group_arn = aws_lb_target_group.instance-tg.arn
-  target_id        = aws_instance.nginx-server.id
-  port             = 80
-}
-
-resource "aws_lb" "instance-lb" {
-  name                      = "instance-lb"
-  internal                  = false
-  load_balancer_type        = "application"
-  security_groups           = [aws_security_group.instance-sg.id]
-  subnets                   = [for subnet in aws_default_subnet.instance-subnet : subnet.id]
-  idle_timeout              = 400
-
-  enable_deletion_protection = true
-
-  tags = {
-    Environment = "Terra-LoadBalancer"
-  }
-}
-
-resource "aws_lb_listener" "front_end" {
-  load_balancer_arn = aws_lb.instance-lb.arn
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.instance-tg.arn
-  }
-}
-
-resource "aws_launch_template" "instance-temp" {
-  name_prefix   = "instance-temp"
-  image_id      = data.aws_ami.ubuntu.id
-  instance_type = "t2.micro"
-}
-
-resource "aws_autoscaling_group" "instance-asg" {
-  name                      = "instance-asg"
-  availability_zones        = ["us-east-1a"]
-  desired_capacity          = 2
-  max_size                  = 2
-  min_size                  = 1
-  health_check_grace_period = 300
-  health_check_type         = "ELB"
-  force_delete              = true
-
-  launch_template {
-    id      = aws_launch_template.instance-temp.id
-    version = "$Latest"
+    cidr_blocks      = ["0.0.0.0/0"]
+    description      = ""
+    from_port        = 0
+    ipv6_cidr_blocks = []
+    prefix_list_ids  = []
+    protocol         = "-1"
+    security_groups  = []
+    self             = false
+    to_port          = 0
   }
 }
 
