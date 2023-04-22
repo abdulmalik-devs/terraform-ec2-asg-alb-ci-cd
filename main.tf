@@ -18,6 +18,7 @@ resource "aws_instance" "nginx-server" {
   instance_type = "t2.micro"
   key_name      = var.key_name
   user_data     = file("./user-data-nginx.tpl")
+  vpc_security_group_ids = [aws_security_group.instance-sg.id]
 
   tags = {
     Name = "nginx-server"
@@ -30,6 +31,7 @@ resource "aws_instance" "apache-server" {
   instance_type = "t2.micro"
   key_name      = var.key_name
   user_data     = file("./user-data-apache.tpl")
+  vpc_security_group_ids = [aws_security_group.instance-sg.id]
 
   tags = {
     Name = "apache-server"
