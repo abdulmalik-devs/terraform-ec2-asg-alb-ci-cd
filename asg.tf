@@ -33,22 +33,22 @@ resource "aws_launch_template" "nginx-temp" {
   }
 }
 
-# Create a launch template for Apache Server
-resource "aws_launch_template" "apache-temp" {
-  name_prefix            = "apache-temp"
-  image_id               = data.aws_ami.ubuntu.id
-  instance_type          = "t2.micro"
-  key_name               = var.key_name
-  vpc_security_group_ids = [aws_security_group.instance-sg.id]
-  user_data              = base64encode(data.template_file.nginx-data-script.rendered)
+# # Create a launch template for Apache Server
+# resource "aws_launch_template" "apache-temp" {
+#   name_prefix            = "apache-temp"
+#   image_id               = data.aws_ami.ubuntu.id
+#   instance_type          = "t2.micro"
+#   key_name               = var.key_name
+#   vpc_security_group_ids = [aws_security_group.instance-sg.id]
+#   user_data              = base64encode(data.template_file.nginx-data-script.rendered)
 
-   tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Name : "apache-temp"
-    }
-  }
-}
+#    tag_specifications {
+#     resource_type = "instance"
+#     tags = {
+#       Name : "apache-temp"
+#     }
+#   }
+# }
 
 data "template_file" "apache-data-script" {
   template = file("./user-data-apache.tpl")
