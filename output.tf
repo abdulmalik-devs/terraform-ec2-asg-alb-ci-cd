@@ -14,6 +14,6 @@ output "load_balancer_dns_name" {
 }
 
 output "aws_subnets_ids" {
-  description = "List of subnets in the V"
+  description = "List of subnets in the VPC"
   value = data.aws_subnets.subnets.ids
 }

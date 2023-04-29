@@ -17,6 +17,7 @@ N.B: The infrastructure can be deployed to multiple environments (e.g. dev, stag
 
 ![apache-output](https://user-images.githubusercontent.com/62616273/233767375-cad80562-1a5d-4a1c-94ae-4c7274adc0be.png)
 
+-------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Pre-requisites
 
