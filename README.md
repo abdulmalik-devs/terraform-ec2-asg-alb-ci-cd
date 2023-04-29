@@ -6,10 +6,18 @@ N.B: The infrastructure can be deployed to multiple environments (e.g. dev, stag
 
 ## Outputs and GHA Process
 
+![dev_branch-init-and-plan](https://user-images.githubusercontent.com/62616273/233767199-d3f23348-8076-45bf-9729-199a21358f60.png)
+
+![main-init-and-apply](https://user-images.githubusercontent.com/62616273/233767266-f2ce83ac-6423-4d0f-a17b-6c47c09fcea4.png)
+
+![ops-branch-init-and-destroy](https://user-images.githubusercontent.com/62616273/233767317-860f15c7-61e3-4a70-bd29-a3a91437866a.png)
 
 -------------------------------------------------------------------------------------------------------------------------------------------
+![nginx-output](https://user-images.githubusercontent.com/62616273/233767341-d5828dff-9b43-4a1c-ba53-b93ce63ed118.png)
 
+![apache-output](https://user-images.githubusercontent.com/62616273/233767375-cad80562-1a5d-4a1c-94ae-4c7274adc0be.png)
 
+-------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Pre-requisites
 
@@ -21,7 +29,7 @@ N.B: The infrastructure can be deployed to multiple environments (e.g. dev, stag
 
 1. Clone this repository:
 
-git clone https://github.com/abdulmalik-devs/terraform-ec2-ci-cd.git
+git clone https://github.com/abdulmalik-devs/terraform-ec2-asg-alb-ci-cd.git
 
 2. Check the code and change the neccessary configuration to suite your deployement
 

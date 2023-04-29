@@ -9,9 +9,11 @@ output "apache-server" {
 }
 
 output "load_balancer_dns_name" {
+  description = "Load Balancer DNS namme"
   value = aws_lb.instance-lb.dns_name
 }
 
 output "aws_subnets_ids" {
+  description = "List of subnets in the VPC"
   value = data.aws_subnets.subnets.ids
 }

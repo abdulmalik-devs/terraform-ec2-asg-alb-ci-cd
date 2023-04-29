@@ -23,14 +23,14 @@ resource "aws_lb_target_group" "instance-tg" {
   vpc_id   = data.aws_vpc.default_vpc.id
 
   health_check {
+    path                = "/"
+    protocol            = "HTTP"
     enabled             = true
-    healthy_threshold   = 3
-    unhealthy_threshold = 3
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
     interval            = 30
     matcher             = "200-399"
-    path                = "/health"
     port                = 80
-    protocol            = "HTTP"
     timeout             = 5
   }
 }
